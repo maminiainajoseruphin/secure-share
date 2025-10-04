@@ -59,10 +59,10 @@ app.post("/create", (req, res) => {
   const hash = hashPassword(password);
   const encrypted = encrypt(content, password);
 
-  // Valeurs par défaut : 1 minute et 1 vue
-  const expiresAt = expireMinutes
-    ? new Date(Date.now() + expireMinutes * 60000).toISOString()
-    : new Date(Date.now() + 60000).toISOString();
+  // Valeurs par défaut : 5 minute et 1 vue
+  const minutes = expireMinutes && Number(expireMinutes) > 0 ? Number(expireMinutes) : 5;
+  const expiresAt = new Date(Date.now() + minutes * 60000).toISOString();
+
 
   const views = maxViews && Number(maxViews) > 0 ? Number(maxViews) : 1;
 
@@ -75,7 +75,6 @@ app.post("/create", (req, res) => {
     }
   );
 });
-
 app.post("/release/:id", (req, res) => {
   const { password } = req.body;
   const { id } = req.params;
@@ -114,24 +113,23 @@ app.post("/release/:id", (req, res) => {
       const remaining = row.views_remaining - 1;
 
       if (remaining <= 0) {
-        // Dernière vue : supprimer
         db.run("DELETE FROM messages WHERE id = ?", [id], () => {
-          return res.json({ content: decrypted });
+          return res.json({ content: decrypted, expiresAt: row.expires_at });
         });
       } else {
-        // Encore des vues : mettre à jour
         db.run("UPDATE messages SET views_remaining = ? WHERE id = ?", [remaining, id], () => {
-          return res.json({ content: decrypted });
+          return res.json({ content: decrypted, expiresAt: row.expires_at });
         });
       }
     } else {
-      // Pas de limite : supprimer après lecture
       db.run("DELETE FROM messages WHERE id = ?", [id], () => {
-        return res.json({ content: decrypted });
+        return res.json({ content: decrypted, expiresAt: row.expires_at });
       });
     }
   });
 });
+
+
 
 
 

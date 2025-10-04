@@ -34,6 +34,14 @@
       width: 100%;
       max-width: 400px;
     }
+    .container-qr{
+      background-color: var(--surface);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      max-width: 400px;
+      margin-left: 10px;
+    }
 
     h2 {
       margin-top: 0;
@@ -121,46 +129,67 @@
 
     <div class="form-right">
       <label for="expireMinutes">Expiration (min)</label>
-      <input type="number" id="expireMinutes" name="expireMinutes" min="1" value="1" />
+      <input type="number" id="expireMinutes" name="expireMinutes" min="1" value="5" />
 
       <label for="maxViews">Consultations</label>
       <input type="number" id="maxViews" name="maxViews" min="1" value="1" />
     </div>
   </div>
-
+  
   <button type="submit">Créer le lien</button>
 </form>
 
-    <input style="border: none;outline: none; margin-bottom: 0;" type="text" id="resultLink" class="link" readonly />
+<textarea style="border: none;outline: none; margin-bottom: 0;" type="text" id="resultLink" class="link" readonly ></textarea>
 
-  </div>
+</div>
 
+  <script src="/lib/qrcode.min.js"></script>
   <script>
     document.getElementById("secureForm").addEventListener("submit", async function (e) {
       e.preventDefault();
+      const container = document.querySelector(".container")
       const password = document.getElementById("password").value;
       const content = document.getElementById("content").value;
       const expireMinutes = document.getElementById("expireMinutes").value;
       const maxViews = document.getElementById("maxViews").value;
 
-
       const response = await fetch("/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, content, expireMinutes,maxViews })
+        body: JSON.stringify({ password, content, expireMinutes, maxViews })
       });
 
       const data = await response.json();
       const result = document.getElementById("resultLink");
+      result.value = "";
+
+      // Supprimer QR précédent s'il existe
+      const oldQR = document.getElementById("qrcode");
+      if (oldQR) oldQR.remove();
 
       if (data.link) {
         result.value = data.link;
         result.focus();
-        result.select(); // sélection automatique
+        result.select();
+
+        // Générer le QR code
+
+        const qrContainer = document.createElement("div");
+        qrContainer.className = "container-qr"
+        qrContainer.id = "qrcode";
+        qrContainer.style.marginTop = "1rem";
+        document.querySelector("body").appendChild(qrContainer);
+
+        new QRCode(qrContainer, {
+          text: data.link,
+          width: 150,
+          height: 150
+        });
       } else {
-        result.value = `Erreur : ${data.error}`;    
+        result.value = `Erreur : ${data.error}`;
       }
     });
   </script>
+
 </body>
 </html>

@@ -94,6 +94,13 @@
       color: #c62828;
       font-weight: bold;
     }
+
+    .countdown {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #555;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -132,6 +139,24 @@
       msg.className = "message";
       msg.textContent = data.content;
       output.appendChild(msg);
+
+      if (data.expiresAt) {
+        const countdown = document.createElement("div");
+        countdown.className = "countdown";
+
+        function updateCountdown() {
+          const now = new Date();
+          const expire = new Date(data.expiresAt);
+          const diff = Math.max(0, expire - now);
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          countdown.textContent = `Expire dans : ${minutes}m ${seconds}s`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        output.appendChild(countdown);
+      }
     } else {
       const err = document.createElement("div");
       err.className = "error";
