@@ -204,7 +204,9 @@
         new QRCode(qrContainer, {
           text: data.link,
           width: 150,
-          height: 150
+          height: 150,
+          colorDark: "#039c55",
+          colorLight: "#ffffff" 
         });
       } else {
         result.value = `Erreur : ${data.error}`;
