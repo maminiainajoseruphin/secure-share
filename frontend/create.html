@@ -14,7 +14,9 @@
       --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
+    h2{
+      color: #039c55;
+    }
     body {
       margin: 0;
       padding: 0;
@@ -33,6 +35,19 @@
       box-shadow: var(--shadow);
       width: 100%;
       max-width: 400px;
+      position: absolute;
+      animation: anim 1s ease-out forwards;
+      z-index: 0;
+    }
+    @keyframes anim {
+      from{
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to{
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
     .container-qr{
       background-color: var(--surface);
@@ -41,6 +56,9 @@
       box-shadow: var(--shadow);
       max-width: 400px;
       margin-left: 10px;
+      animation: anim 1s ease-out forwards;
+      position: absolute;
+      transform: translateX(200%);
     }
 
     h2 {
@@ -110,34 +128,37 @@
     button {
       margin-top: 1rem;
     }
+    #secureForm,h2{
+      user-select: none !important;
+    }
     
 
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Créer un message sécurisé</h2>
+    <h2>Be ys Outsourcing <br>Pass.byos.mg</h2>
     <form id="secureForm">
-  <div class="form-row">
-    <div class="form-left">
-      <label for="password">Mot de passe</label>
-      <input type="password" id="password" name="password" required />
+      <div class="form-row">
+        <div class="form-left">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" name="password" required />
 
-      <label for="content">Message</label>
-      <textarea id="content" name="content" rows="4" required></textarea>
-    </div>
+          <label for="content">Message</label>
+          <textarea id="content" name="content" rows="4" required></textarea>
+        </div>
 
-    <div class="form-right">
-      <label for="expireMinutes">Expiration (min)</label>
-      <input type="number" id="expireMinutes" name="expireMinutes" min="1" value="5" />
+        <div class="form-right">
+          <label for="expireMinutes">Expiration (min)</label>
+          <input type="number" id="expireMinutes" name="expireMinutes" min="1" value="5" />
 
-      <label for="maxViews">Consultations</label>
-      <input type="number" id="maxViews" name="maxViews" min="1" value="1" />
-    </div>
-  </div>
-  
-  <button type="submit">Créer le lien</button>
-</form>
+          <label for="maxViews">Consultations</label>
+          <input type="number" id="maxViews" name="maxViews" min="1" value="1" />
+        </div>
+      </div>
+      
+      <button type="submit">Créer le lien</button>
+    </form>
 
 <textarea style="border: none;outline: none; margin-bottom: 0;" type="text" id="resultLink" class="link" readonly ></textarea>
 
@@ -145,9 +166,9 @@
 
   <script src="/lib/qrcode.min.js"></script>
   <script>
+
     document.getElementById("secureForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const container = document.querySelector(".container")
       const password = document.getElementById("password").value;
       const content = document.getElementById("content").value;
       const expireMinutes = document.getElementById("expireMinutes").value;
@@ -188,7 +209,33 @@
       } else {
         result.value = `Erreur : ${data.error}`;
       }
+
+
+      const dragDiv = document.querySelector('.container-qr');
+      let isDragging = false;
+      let offsetX, offsetY;
+  
+      dragDiv.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - dragDiv.offsetLeft;
+        offsetY = e.clientY - dragDiv.offsetTop;
+        dragDiv.style.cursor = 'grabbing';
+      });
+  
+      document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          dragDiv.style.left = (e.clientX - offsetX) + 'px';
+          dragDiv.style.top = (e.clientY - offsetY) + 'px';
+        }
+      });
+  
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        dragDiv.style.cursor = 'grab';
+      });
+
     });
+
   </script>
 
 </body>

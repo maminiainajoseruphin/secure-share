@@ -7,15 +7,15 @@ const db = require("./db");
 const app = express();
 app.use(express.json());
 
-// ✅ Sert les fichiers statiques depuis le dossier "frontend"
+//  Sert les fichiers statiques depuis le dossier "frontend"
 app.use(express.static(path.join(__dirname, "frontend")));
 
-// 🔐 Fonction utilitaire : hash du mot de passe
+//  Fonction utilitaire : hash du mot de passe
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
-// 🔐 Chiffrement AES
+//  Chiffrement AES
 function encrypt(text, password) {
   const key = crypto.createHash("sha256").update(password).digest();
   const iv = crypto.randomBytes(16);
@@ -25,7 +25,7 @@ function encrypt(text, password) {
   return { iv: iv.toString("hex"), data: encrypted };
 }
 
-// 🔐 Déchiffrement AES
+//  Déchiffrement AES
 function decrypt(encrypted, password, iv) {
   const key = crypto.createHash("sha256").update(password).digest();
   const decipher = crypto.createDecipheriv(
@@ -38,17 +38,17 @@ function decrypt(encrypted, password, iv) {
   return decrypted;
 }
 
-// ✅ Route GET pour afficher create.html
+//  Route GET pour afficher create.html
 app.get("/create", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "create.html"));
 });
 
-// ✅ Route GET pour afficher release.html dynamiquement
+//  Route GET pour afficher release.html dynamiquement
 app.get("/release/:id", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "release.html"));
 });
 
-// ✅ Endpoint POST pour créer un message sécurisé
+//  Endpoint POST pour créer un message sécurisé
 app.post("/create", (req, res) => {
   const { password, content, expireMinutes, maxViews } = req.body;
   if (!password || !content) {
@@ -75,6 +75,8 @@ app.post("/create", (req, res) => {
     }
   );
 });
+
+
 app.post("/release/:id", (req, res) => {
   const { password } = req.body;
   const { id } = req.params;
@@ -133,8 +135,9 @@ app.post("/release/:id", (req, res) => {
 
 
 
-// ✅ Démarrage du serveur
+//  Démarrage du serveur
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Serveur lancé sur http://0.0.0.0:${PORT}`);
 });
+
