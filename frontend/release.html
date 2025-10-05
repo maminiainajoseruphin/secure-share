@@ -155,7 +155,17 @@
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
+
         output.appendChild(countdown);
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "Copier";
+        copyBtn.style.marginTop = "1rem";
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(data.content);
+          copyBtn.textContent = "Copie prise en compte !";
+        };
+        output.appendChild(copyBtn);
+
       }
     } else {
       const err = document.createElement("div");
